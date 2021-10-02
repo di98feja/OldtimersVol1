@@ -5,6 +5,14 @@ using Microsoft.Xna.Framework.Media;
 
 namespace OldtimersVol1
 {
+    public enum States
+    {
+        LogoFadein,
+        RocketStage1,
+        RocketStage2,
+        RocketStage3
+    }
+
     public class Demo : Game
     {
         private Texture2D _backgroundTexture;
@@ -12,12 +20,16 @@ namespace OldtimersVol1
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private Vector2 _bgPos;
+        private Vector2 _rocketStartPos;
         private Vector2 _rocketTargetPos;
         private Vector2 _rocketCurrentPos;
+        private float _rocketEase;
         private readonly Vector2 _rocketSize = new Vector2(168, 100);
         private int _rocketCurrentFrame = 0;
         private float _rocketFrameTimer = 0f;
         private const int _rocketYDrift = 5;
+        private const int _rocketStayDelay = 10000;
+        private int _rocketStayTimer;
         private int _rocketYPos;
         private System.Random _random;
 
@@ -25,7 +37,7 @@ namespace OldtimersVol1
         private SpriteFont font;
         private Song song;
         private float _rocketXLerp = 0.01f;
-        private int _state = 0;
+        private States _state = States.RocketStage1;
         private const string _scrollText = "Oldtimers presents stuff at n0LanX, for times that used to be";
 
         public Demo()
@@ -44,7 +56,8 @@ namespace OldtimersVol1
             //new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
             _textScrollerPos = new Vector2(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight - 30);
             _rocketYPos = _graphics.PreferredBackBufferHeight - 200;
-            _rocketCurrentPos = new Vector2(-100, _rocketYPos);
+            _rocketStartPos = new Vector2(-100, _rocketYPos);
+            _rocketCurrentPos = _rocketStartPos;
             this.song = Content.Load<Song>("technogeek");
             MediaPlayer.Play(song);
 
@@ -81,20 +94,40 @@ namespace OldtimersVol1
             //}
 
             // Rocket
-            if (gameTime.TotalGameTime.TotalMilliseconds > 10000 && _state == 0)
+            if (_rocketTargetPos.X - _rocketCurrentPos.X < 1f && _state == States.RocketStage1)
             {
-                _rocketTargetPos.X = _graphics.PreferredBackBufferWidth + 300;
-                _rocketXLerp = -_rocketXLerp;
-                _state = 1;
+                _rocketTargetPos.X = _graphics.PreferredBackBufferWidth;
+                _rocketStartPos = _rocketCurrentPos;
+                _state = States.RocketStage2;
+                _rocketStayTimer = (int)(gameTime.TotalGameTime.TotalMilliseconds + _rocketStayDelay);
             }
+            else if (gameTime.TotalGameTime.TotalMilliseconds > _rocketStayTimer && _state == States.RocketStage2)
+            {
+                _state = States.RocketStage3;
+            }
+            else if (_rocketTargetPos.X - _rocketCurrentPos.X < 1f && _state == States.RocketStage3)
+            {
+                _state = States.LogoFadein;
+            }
+
             if (System.Math.Abs(_rocketCurrentPos.Y - _rocketTargetPos.Y) < 2)
             {
                 _rocketTargetPos.Y = _random.Next(_rocketYPos - _rocketYDrift, _rocketYPos + _rocketYDrift);
             }
             else
             {
-                _rocketCurrentPos.X = MathHelper.Lerp(_rocketCurrentPos.X, _rocketTargetPos.X, _rocketXLerp);
-                _rocketCurrentPos.Y = MathHelper.Lerp(_rocketCurrentPos.Y, _rocketTargetPos.Y, 0.1f);
+                if (_state == States.RocketStage1)
+                {
+                    _rocketEase += (float)(System.Math.PI/2) / 100;
+                    _rocketCurrentPos.X = _rocketStartPos.X + (_rocketTargetPos.X - _rocketStartPos.X) * (float)System.Math.Sin(_rocketEase);
+                    _rocketCurrentPos.Y = MathHelper.Lerp(_rocketStartPos.Y, _rocketTargetPos.Y, 0.1f);
+                }
+                else if (_state == States.RocketStage3)
+                {
+                    _rocketEase -= (float)(System.Math.PI / 2) / 100;
+                    _rocketCurrentPos.X = _rocketTargetPos.X - (_rocketTargetPos.X - _rocketStartPos.X) * (float)System.Math.Sin(_rocketEase);
+                    _rocketCurrentPos.Y = MathHelper.Lerp(_rocketStartPos.Y, _rocketTargetPos.Y, 0.1f);
+                }
             }
             if (_rocketFrameTimer < gameTime.TotalGameTime.TotalMilliseconds)
             {
@@ -123,6 +156,20 @@ namespace OldtimersVol1
 
             _spriteBatch.End();
             base.Draw(gameTime);
+        }
+
+        enum EaseType { None, In, Out, InOut }
+
+        private float Ease(float t, EaseType easeType)
+        {
+            if (easeType == EaseType.None)
+                return t;
+            else if (easeType == EaseType.In)
+                return MathHelper.Lerp(0.0f, 1.0f, (float)(1.0 - System.Math.Cos(t * System.Math.PI * .5)));
+            else if (easeType == EaseType.Out)
+                return MathHelper.Lerp(0.0f, 1.0f, (float)System.Math.Sin(t * System.Math.PI * .5));
+            else
+                return MathHelper.SmoothStep(0.0f, 1.0f, t);
         }
     }
 }
