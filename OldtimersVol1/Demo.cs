@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 
 namespace OldtimersVol1
 {
@@ -16,7 +17,8 @@ namespace OldtimersVol1
         private int _rocketYPos;
 
         private Vector2 _textScrollerPos;
-        private SpriteFont font;
+        //private SpriteFont font;
+        private Song song;
         private const string _scrollText = "Oldtimers presents stuff at n0LanX, for times that used to be";
 
         public Demo()
@@ -26,7 +28,7 @@ namespace OldtimersVol1
             _graphics.PreferredBackBufferHeight = 600; 
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
-            font = Content.Load<SpriteFont>("2P");
+            //font = Content.Load<SpriteFont>("2P");
         }
 
         protected override void Initialize()
@@ -35,6 +37,9 @@ namespace OldtimersVol1
             _textScrollerPos = new Vector2(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight-30);
             _rocketYPos = _graphics.PreferredBackBufferHeight - 100;
             _rocketCurrentPos = new Vector2(-100, _rocketYPos);
+            this.song = Content.Load<Song>("technogeek");
+            MediaPlayer.Play(song);
+
             base.Initialize();
         }
 
@@ -58,11 +63,11 @@ namespace OldtimersVol1
             }
 
             // Scroller
-            _textScrollerPos.X = _textScrollerPos.X - 2;
-            if (_textScrollerPos.X < -font.MeasureString(_scrollText).X + 1)
-            {
-                _textScrollerPos.X = _graphics.PreferredBackBufferWidth;
-            }
+            //_textScrollerPos.X = _textScrollerPos.X - 2;
+            //if (_textScrollerPos.X < -font.MeasureString(_scrollText).X + 1)
+            //{
+            //    _textScrollerPos.X = _graphics.PreferredBackBufferWidth;
+            //}
 
             // Rocket
             if (Vector2.Distance(_rocketCurrentPos, _rocketTargetPos) > 2)
@@ -82,7 +87,7 @@ namespace OldtimersVol1
             _spriteBatch.Draw(_backgroundTexture, new Vector2(_bgPos.X + 800, _bgPos.Y), Color.White);
 
             // Text scroller
-            _spriteBatch.DrawString(font, _scrollText, _textScrollerPos, Color.White, 0, new Vector2(0,0), 1.0f, SpriteEffects.None, 0.5f);
+            //_spriteBatch.DrawString(font, _scrollText, _textScrollerPos, Color.White, 0, new Vector2(0,0), 1.0f, SpriteEffects.None, 0.5f);
 
             _spriteBatch.End();
             base.Draw(gameTime);
