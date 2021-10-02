@@ -4,27 +4,29 @@ using Microsoft.Xna.Framework.Input;
 
 namespace OldtimersVol1
 {
-    public class Game1 : Game
+    public class Demo : Game
     {
-        Texture2D _backgroundTexture;
+        private Texture2D _backgroundTexture;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private Vector2 _bgPos;
+        private SpriteFont font;
+        private const string _scrollText = "Oldtimers presents stuff at n0LanX, for times that used to be";
 
-        public Game1()
+        public Demo()
         {
             _graphics = new GraphicsDeviceManager(this);
             _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight = 600; 
             Content.RootDirectory = "Content";
-            IsMouseVisible = true;
+            IsMouseVisible = false;
+            font = this.Content.Load<SpriteFont>("Fonts/myFont");
         }
 
         protected override void Initialize()
-        {
-            // TODO: Add your initialization logic here
+       {
             //new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
-            
+
             base.Initialize();
         }
 
@@ -52,12 +54,19 @@ namespace OldtimersVol1
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-
             _spriteBatch.Begin();
+
+            // Background
             _spriteBatch.Draw(_backgroundTexture, _bgPos, Color.White);
             _spriteBatch.Draw(_backgroundTexture, new Vector2(_bgPos.X + 800, _bgPos.Y), Color.White);
-            _spriteBatch.End();
 
+            // Text scroller
+            Vector2 textMiddlePoint = font.MeasureString(_scrollText) / 2;
+            // Places text in center of the screen
+            Vector2 position = new Vector2(this.Window.ClientBounds.Width / 2, this.Window.ClientBounds.Height / 2);
+            _spriteBatch.DrawString(font, _scrollText, position, Color.White, 0, textMiddlePoint, 1.0f, SpriteEffects.None, 0.5f);
+
+            _spriteBatch.End();
             base.Draw(gameTime);
         }
     }
