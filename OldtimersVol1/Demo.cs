@@ -8,6 +8,7 @@ namespace OldtimersVol1
     public enum States
     {
         LogoFadein,
+        LogoFadeOut,
         RocketStage1,
         RocketStage2,
         RocketStage3
@@ -18,6 +19,7 @@ namespace OldtimersVol1
         private Texture2D _backgroundTexture;
         private Texture2D _rocketTexture;
         private Texture2D _cometTexture;
+        private Texture2D _logoTexture;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private Vector2 _bgPos;
@@ -25,6 +27,7 @@ namespace OldtimersVol1
         private Vector2 _rocketTargetPos;
         private Vector2 _rocketCurrentPos;
         private float _rocketEase;
+        private float _logoFade;
         private readonly Vector2 _rocketSize = new Vector2(168, 100);
         private int _rocketCurrentFrame = 0;
         private float _rocketFrameTimer = 0f;
@@ -40,7 +43,7 @@ namespace OldtimersVol1
         private SpriteFont font;
         private Song song;
         private float _rocketXLerp = 0.01f;
-        private States _state = States.RocketStage1;
+        private States _state = States.LogoFadein;
         private bool comets;
         private double cometsTime;
         private const string _scrollText = "Oldtimers presents stuff at n0LanX, from times that used to be";
@@ -124,7 +127,7 @@ namespace OldtimersVol1
         public Demo()
         {
             _graphics = new GraphicsDeviceManager(this);
-            //_graphics.IsFullScreen = true;
+            _graphics.IsFullScreen = true;
             _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight = 600;
             Content.RootDirectory = "Content";
@@ -138,7 +141,7 @@ namespace OldtimersVol1
             _tipsScrollerPos = new Vector2(_graphics.PreferredBackBufferWidth, 30);
             _cometPos = new Vector2(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight - 60);
             _rocketYPos = _graphics.PreferredBackBufferHeight - 200;
-            _rocketStartPos = new Vector2(-100, _rocketYPos);
+            _rocketStartPos = new Vector2(-200, _rocketYPos);
             _rocketCurrentPos = _rocketStartPos;
             this.song = Content.Load<Song>("technogeek");
             MediaPlayer.Play(song);
@@ -156,6 +159,7 @@ namespace OldtimersVol1
             _cometTexture = Content.Load<Texture2D>("comet");
             _backgroundTexture = Content.Load<Texture2D>("starsBackground");
             _rocketTexture = Content.Load<Texture2D>("rocket");
+            _logoTexture = Content.Load<Texture2D>("logo");
         }
 
         protected override void Update(GameTime gameTime)
@@ -180,6 +184,12 @@ namespace OldtimersVol1
             if (_tipsScrollerPos.X < -font.MeasureString(_scrollTips).X + 1)
             {
                 _tipsScrollerPos.X = _graphics.PreferredBackBufferWidth;
+            }
+
+            // Logo
+            if (_state == States.LogoFadein)
+            {
+
             }
 
             // Rocket
@@ -257,25 +267,14 @@ namespace OldtimersVol1
             _spriteBatch.DrawString(font, _scrollText, _textScrollerPos, Color.Green, 0, new Vector2(0,0), 1.0f, SpriteEffects.None, 0.5f);
             _spriteBatch.DrawString(font, _scrollTips, _tipsScrollerPos, Color.Green, 0, new Vector2(0, 0), 1.0f, SpriteEffects.None, 0.5f);
 
+            // Logo
+            _spriteBatch.Draw(_logoTexture, new Vector2(0f, 100), new Color(Color.White, 0.0f));
+
             // Comets
             _spriteBatch.Draw(_cometTexture, _cometPos, null, Color.White);
 
             _spriteBatch.End();
             base.Draw(gameTime);
-        }
-
-        enum EaseType { None, In, Out, InOut }
-
-        private float Ease(float t, EaseType easeType)
-        {
-            if (easeType == EaseType.None)
-                return t;
-            else if (easeType == EaseType.In)
-                return MathHelper.Lerp(0.0f, 1.0f, (float)(1.0 - System.Math.Cos(t * System.Math.PI * .5)));
-            else if (easeType == EaseType.Out)
-                return MathHelper.Lerp(0.0f, 1.0f, (float)System.Math.Sin(t * System.Math.PI * .5));
-            else
-                return MathHelper.SmoothStep(0.0f, 1.0f, t);
         }
     }
 }
