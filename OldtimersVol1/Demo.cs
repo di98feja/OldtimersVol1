@@ -9,6 +9,7 @@ namespace OldtimersVol1
     {
         private Texture2D _backgroundTexture;
         private Texture2D _rocketTexture;
+        private Texture2D _cometTexture;
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private Vector2 _bgPos;
@@ -23,10 +24,13 @@ namespace OldtimersVol1
 
         private Vector2 _textScrollerPos;
         private Vector2 _tipsScrollerPos;
+        private Vector2 _cometPos;
         private SpriteFont font;
         private Song song;
         private float _rocketXLerp = 0.01f;
         private int _state = 0;
+        private bool comets;
+        private double cometsTime;
         private const string _scrollText = "Oldtimers presents stuff at n0LanX, from times that used to be";
         private string _scrollTips = (@"Ladies and gentlemen of the class of '97
                                             Wear sunscreen
@@ -120,11 +124,12 @@ namespace OldtimersVol1
             //new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
             _textScrollerPos = new Vector2(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight - 30);
             _tipsScrollerPos = new Vector2(_graphics.PreferredBackBufferWidth, 30);
+            _cometPos = new Vector2(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight - 60);
             _rocketYPos = _graphics.PreferredBackBufferHeight - 200;
             _rocketCurrentPos = new Vector2(-100, _rocketYPos);
             this.song = Content.Load<Song>("technogeek");
             MediaPlayer.Play(song);
-
+            comets = false;
             _rocketTargetPos = new Vector2(_graphics.PreferredBackBufferWidth / 2 - _rocketSize.X / 2, _rocketYPos);
             _random = new System.Random();
             font = Content.Load<SpriteFont>("2P");
@@ -134,7 +139,7 @@ namespace OldtimersVol1
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
+            _cometTexture = Content.Load<Texture2D>("comet");
             _backgroundTexture = Content.Load<Texture2D>("starsBackground");
             _rocketTexture = Content.Load<Texture2D>("rocket");
         }
@@ -157,7 +162,6 @@ namespace OldtimersVol1
             {
                 _textScrollerPos.X = _graphics.PreferredBackBufferWidth;
             }
-            // Scroller
             _tipsScrollerPos.X = _tipsScrollerPos.X - 5;
             if (_tipsScrollerPos.X < -font.MeasureString(_scrollTips).X + 1)
             {
@@ -186,6 +190,27 @@ namespace OldtimersVol1
                 _rocketCurrentFrame = ++_rocketCurrentFrame % 3;
             }
 
+            // Comets
+            if (comets)
+            {
+                _cometPos.X = _cometPos.X - 10f;
+                cometsTime = gameTime.TotalGameTime.TotalSeconds;
+                if (_cometPos.X < -2000)
+                {
+                    comets = false;
+                    _cometPos.Y =  _random.Next(-100, _graphics.PreferredBackBufferHeight);
+                    _cometPos.X = _graphics.PreferredBackBufferWidth;
+                }
+
+            }
+            else
+            {
+                if (gameTime.TotalGameTime.TotalSeconds - cometsTime > 1)
+                {
+                    comets = true;
+                }
+            }
+
             base.Update(gameTime);
         }
 
@@ -205,6 +230,9 @@ namespace OldtimersVol1
             // Text scroller
             _spriteBatch.DrawString(font, _scrollText, _textScrollerPos, Color.Green, 0, new Vector2(0,0), 1.0f, SpriteEffects.None, 0.5f);
             _spriteBatch.DrawString(font, _scrollTips, _tipsScrollerPos, Color.Green, 0, new Vector2(0, 0), 1.0f, SpriteEffects.None, 0.5f);
+
+            // Comets
+            _spriteBatch.Draw(_cometTexture, _cometPos, null, Color.White);
 
             _spriteBatch.End();
             base.Draw(gameTime);
