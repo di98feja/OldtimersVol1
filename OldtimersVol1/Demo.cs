@@ -10,6 +10,12 @@ namespace OldtimersVol1
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
         private Vector2 _bgPos;
+        private Vector2 _rocketTargetPos;
+        private Vector2 _rocketCurrentPos;
+        private const int _rocketYDrift = 10;
+        private int _rocketYPos;
+
+        private Vector2 _textScrollerPos;
         private SpriteFont font;
         private const string _scrollText = "Oldtimers presents stuff at n0LanX, for times that used to be";
 
@@ -20,13 +26,15 @@ namespace OldtimersVol1
             _graphics.PreferredBackBufferHeight = 600; 
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
-            font = this.Content.Load<SpriteFont>("Fonts/myFont");
+            font = this.Content.Load<SpriteFont>("font");
         }
 
         protected override void Initialize()
        {
             //new Vector2(_graphics.PreferredBackBufferWidth / 2, _graphics.PreferredBackBufferHeight / 2);
-
+            _textScrollerPos = new Vector2(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight-30);
+            _rocketYPos = _graphics.PreferredBackBufferHeight - 100;
+            _rocketCurrentPos = new Vector2(-100, _rocketYPos);
             base.Initialize();
         }
 
@@ -42,12 +50,25 @@ namespace OldtimersVol1
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            // Background
             _bgPos.X = _bgPos.X - 1;
             if (_bgPos.X < -_graphics.PreferredBackBufferWidth+1)
             {
                 _bgPos.X = 0;
             }
 
+            // Scroller
+            _textScrollerPos.X = _textScrollerPos.X - 2;
+            if (_textScrollerPos.X < -font.MeasureString(_scrollText).X + 1)
+            {
+                _textScrollerPos.X = _graphics.PreferredBackBufferWidth;
+            }
+
+            // Rocket
+            if (Vector2.Distance(_rocketCurrentPos, _rocketTargetPos) > 2)
+            {
+                _rocketTargetPos.Y = _rocketYPos;
+            }
             base.Update(gameTime);
         }
 
@@ -61,10 +82,7 @@ namespace OldtimersVol1
             _spriteBatch.Draw(_backgroundTexture, new Vector2(_bgPos.X + 800, _bgPos.Y), Color.White);
 
             // Text scroller
-            Vector2 textMiddlePoint = font.MeasureString(_scrollText) / 2;
-            // Places text in center of the screen
-            Vector2 position = new Vector2(this.Window.ClientBounds.Width / 2, this.Window.ClientBounds.Height / 2);
-            _spriteBatch.DrawString(font, _scrollText, position, Color.White, 0, textMiddlePoint, 1.0f, SpriteEffects.None, 0.5f);
+            _spriteBatch.DrawString(font, _scrollText, _textScrollerPos, Color.White, 0, new Vector2(0,0), 1.0f, SpriteEffects.None, 0.5f);
 
             _spriteBatch.End();
             base.Draw(gameTime);
