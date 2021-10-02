@@ -142,7 +142,8 @@ namespace OldtimersVol1
             _rocketCurrentPos = _rocketStartPos;
             this.song = Content.Load<Song>("technogeek");
             MediaPlayer.Play(song);
-            comets = false;
+            comets = true;
+            cometsTime = 0;
             _rocketTargetPos = new Vector2(_graphics.PreferredBackBufferWidth / 2 - _rocketSize.X / 2, _rocketYPos);
             _random = new System.Random();
             font = Content.Load<SpriteFont>("2P");
@@ -223,21 +224,17 @@ namespace OldtimersVol1
             if (comets)
             {
                 _cometPos.X = _cometPos.X - 10f;
-                cometsTime = gameTime.TotalGameTime.TotalSeconds;
-                if (_cometPos.X < -2000)
+                if (_cometPos.X < -500)
                 {
                     comets = false;
-                    _cometPos.Y =  _random.Next(-100, _graphics.PreferredBackBufferHeight);
+                    _cometPos.Y =  _random.Next(-100, _graphics.PreferredBackBufferHeight-100);
                     _cometPos.X = _graphics.PreferredBackBufferWidth;
                 }
 
             }
             else
             {
-                if (gameTime.TotalGameTime.TotalSeconds - cometsTime > 1)
-                {
-                    comets = true;
-                }
+                comets = true;
             }
 
             base.Update(gameTime);
