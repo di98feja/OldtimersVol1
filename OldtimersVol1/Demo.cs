@@ -40,7 +40,7 @@ namespace OldtimersVol1
         private SpriteFont font;
         private Song song;
         private float _rocketXLerp = 0.01f;
-        private int _state = 0;
+        private States _state = States.RocketStage1;
         private bool comets;
         private double cometsTime;
         private const string _scrollText = "Oldtimers presents stuff at n0LanX, from times that used to be";
@@ -124,7 +124,7 @@ namespace OldtimersVol1
         public Demo()
         {
             _graphics = new GraphicsDeviceManager(this);
-            _graphics.IsFullScreen = true;
+            //_graphics.IsFullScreen = true;
             _graphics.PreferredBackBufferWidth = 800;
             _graphics.PreferredBackBufferHeight = 600;
             Content.RootDirectory = "Content";
@@ -202,20 +202,16 @@ namespace OldtimersVol1
             {
                 _rocketTargetPos.Y = _random.Next(_rocketYPos - _rocketYDrift, _rocketYPos + _rocketYDrift);
             }
-            else
+            _rocketCurrentPos.Y = MathHelper.Lerp(_rocketCurrentPos.Y, _rocketTargetPos.Y, 0.1f);
+            if (_state == States.RocketStage1)
             {
-                if (_state == States.RocketStage1)
-                {
-                    _rocketEase += (float)(System.Math.PI/2) / 100;
-                    _rocketCurrentPos.X = _rocketStartPos.X + (_rocketTargetPos.X - _rocketStartPos.X) * (float)System.Math.Sin(_rocketEase);
-                    _rocketCurrentPos.Y = MathHelper.Lerp(_rocketStartPos.Y, _rocketTargetPos.Y, 0.1f);
-                }
-                else if (_state == States.RocketStage3)
-                {
-                    _rocketEase -= (float)(System.Math.PI / 2) / 100;
-                    _rocketCurrentPos.X = _rocketTargetPos.X - (_rocketTargetPos.X - _rocketStartPos.X) * (float)System.Math.Sin(_rocketEase);
-                    _rocketCurrentPos.Y = MathHelper.Lerp(_rocketStartPos.Y, _rocketTargetPos.Y, 0.1f);
-                }
+                _rocketEase += (float)(System.Math.PI/2) / 100;
+                _rocketCurrentPos.X = _rocketStartPos.X + (_rocketTargetPos.X - _rocketStartPos.X) * (float)System.Math.Sin(_rocketEase);
+            }
+            else if (_state == States.RocketStage3)
+            {
+                _rocketEase -= (float)(System.Math.PI / 2) / 100;
+                _rocketCurrentPos.X = _rocketTargetPos.X - (_rocketTargetPos.X - _rocketStartPos.X) * (float)System.Math.Sin(_rocketEase);
             }
             if (_rocketFrameTimer < gameTime.TotalGameTime.TotalMilliseconds)
             {
