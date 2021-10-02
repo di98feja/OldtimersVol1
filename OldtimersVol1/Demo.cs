@@ -26,7 +26,7 @@ namespace OldtimersVol1
             _graphics.PreferredBackBufferHeight = 600; 
             Content.RootDirectory = "Content";
             IsMouseVisible = false;
-            font = this.Content.Load<SpriteFont>("font");
+            font = Content.Load<SpriteFont>("2P");
         }
 
         protected override void Initialize()
