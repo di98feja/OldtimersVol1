@@ -23,6 +23,7 @@ namespace OldtimersVol1
 
         private Vector2 _textScrollerPos;
         private SpriteFont font;
+        private Song song;
         private float _rocketXLerp = 0.01f;
         private int _state = 0;
         private const string _scrollText = "Oldtimers presents stuff at n0LanX, for times that used to be";
