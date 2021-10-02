@@ -46,7 +46,7 @@ namespace OldtimersVol1
         private States _state = States.LogoFadein;
         private bool comets;
         private double cometsTime;
-        private const string _scrollText = "Oldtimers presents stuff at n0LanX, from times that used to be";
+        private const string _scrollText = "Old farts presents stuff at n0LanX, from times that used to be, (Barg, Morg and darker of old farts 2021)";
         private string _scrollTips = (@"'Ladies' and 'gentlemen' ...   well.  all participants of the n0lanX
 Wear sunscreen
 If I could offer you only one tip for the future, sunscreen would be it
@@ -122,6 +122,7 @@ Advice is a form of nostalgia, dispensing it is a way of fishing the past
 From the disposal, wiping it off, painting over the ugly parts
 And recycling it for more than it's worth
 But trust me on the sunscreen  ").Replace("\n", "      ");
+        private Vector2 length;
 
         public Demo()
         {
@@ -175,17 +176,19 @@ But trust me on the sunscreen  ").Replace("\n", "      ");
 
             // Scroller
             _textScrollerPos.X = _textScrollerPos.X - 2;
-            if (_textScrollerPos.X < -font.MeasureString(_scrollText).X + 1)
+            if (_textScrollerPos.X < -(font.MeasureString(_scrollText).X + _graphics.PreferredBackBufferWidth))
             {
                 _textScrollerPos.X = _graphics.PreferredBackBufferWidth;
             }
-            if (_state == States.RocketStage2)
+            if (_state == States.RocketStage2 || _state == States.RocketStage3)
             {
                 _tipsScrollerPos.X = _tipsScrollerPos.X - 5;
-                if (_tipsScrollerPos.X < -font.MeasureString(_scrollTips).X + 1)
+                if (_tipsScrollerPos.X < -(font.MeasureString(_scrollTips).X* 3 + _graphics.PreferredBackBufferWidth))
                 {
                     _tipsScrollerPos.X = _graphics.PreferredBackBufferWidth;
+                    _state = States.RocketStage3;
                 }
+
             }
             
 
@@ -207,10 +210,7 @@ But trust me on the sunscreen  ").Replace("\n", "      ");
                 _state = States.RocketStage2;
                 _rocketStayTimer = (int)(gameTime.TotalGameTime.TotalMilliseconds + _rocketStayDelay);
             }
-            else if (gameTime.TotalGameTime.TotalMilliseconds > _rocketStayTimer && _state == States.RocketStage2)
-            {
-                _state = States.RocketStage3;
-            }
+            
             else if (_rocketTargetPos.X - _rocketCurrentPos.X < 1f && _state == States.RocketStage3)
             {
                 _state = States.LogoFadein;
