@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 
 namespace OldtimersVol1
 {
@@ -43,6 +44,9 @@ namespace OldtimersVol1
             _textScrollerPos = new Vector2(_graphics.PreferredBackBufferWidth, _graphics.PreferredBackBufferHeight - 30);
             _rocketYPos = _graphics.PreferredBackBufferHeight - 200;
             _rocketCurrentPos = new Vector2(-100, _rocketYPos);
+            this.song = Content.Load<Song>("technogeek");
+            MediaPlayer.Play(song);
+
             _rocketTargetPos = new Vector2(_graphics.PreferredBackBufferWidth / 2 - _rocketSize.X / 2, _rocketYPos);
             _random = new System.Random();
             base.Initialize();
