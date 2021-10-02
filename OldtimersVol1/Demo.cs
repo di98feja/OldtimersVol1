@@ -27,7 +27,7 @@ namespace OldtimersVol1
         private Vector2 _rocketTargetPos;
         private Vector2 _rocketCurrentPos;
         private float _rocketEase;
-        private float _logoFade;
+        private float _logoFade = 0f;
         private readonly Vector2 _rocketSize = new Vector2(168, 100);
         private int _rocketCurrentFrame = 0;
         private float _rocketFrameTimer = 0f;
@@ -189,7 +189,11 @@ namespace OldtimersVol1
             // Logo
             if (_state == States.LogoFadein)
             {
-
+                _logoFade += 0.002f;
+                if (_logoFade >= 1.0f)
+                {
+                    _state = States.RocketStage1;
+                }
             }
 
             // Rocket
@@ -253,7 +257,7 @@ namespace OldtimersVol1
         protected override void Draw(GameTime gameTime)
         {
             GraphicsDevice.Clear(Color.Black);
-            _spriteBatch.Begin();
+            _spriteBatch.Begin(SpriteSortMode.Immediate, BlendState.AlphaBlend);
 
             // Background
             _spriteBatch.Draw(_backgroundTexture, _bgPos, Color.White);
@@ -268,7 +272,7 @@ namespace OldtimersVol1
             _spriteBatch.DrawString(font, _scrollTips, _tipsScrollerPos, Color.Green, 0, new Vector2(0, 0), 1.0f, SpriteEffects.None, 0.5f);
 
             // Logo
-            _spriteBatch.Draw(_logoTexture, new Vector2(0f, 100), new Color(Color.White, 0.0f));
+            _spriteBatch.Draw(_logoTexture, new Vector2(0f, 100), Color.White * _logoFade);
 
             // Comets
             _spriteBatch.Draw(_cometTexture, _cometPos, null, Color.White);
