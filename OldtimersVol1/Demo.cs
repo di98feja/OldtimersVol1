@@ -145,6 +145,7 @@ But trust me on the sunscreen  ").Replace("\n", "      ");
             _rocketCurrentPos = _rocketStartPos;
             this.song = Content.Load<Song>("technogeek");
             MediaPlayer.Play(song);
+            MediaPlayer.IsRepeating = true;
             comets = true;
             cometsTime = 0;
             _rocketTargetPos = new Vector2(_graphics.PreferredBackBufferWidth / 2 - _rocketSize.X / 2, _rocketYPos);
